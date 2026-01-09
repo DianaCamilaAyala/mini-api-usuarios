@@ -4,63 +4,79 @@ namespace App\Http\Controllers;
 
 use App\Models\Usuario;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class UsuarioController extends Controller
 {
-    // 1. LISTAR TODOS
-    public function index()
+    /**
+     * Listar usuarios con un toque de elegancia.
+     * Permitimos filtrar por puesto para darle más utilidad.
+     */
+    public function index(Request $request)
     {
-        $usuarios = Usuario::all();
-        return response()->json($usuarios, 200);
+        $query = Usuario::query();
+
+        // Filtro discreto: si envían ?puesto= lo filtramos
+        if ($request->has('puesto')) {
+            $query->where('puesto', 'like', '%' . $request->puesto . '%');
+        }
+
+        // Seleccionamos solo los campos necesarios para que sea minimalista
+        $usuarios = $query->select('id', 'nombre', 'email', 'puesto')->get();
+
+        return response()->json([
+            'status' => 'success',
+            'count'  => $usuarios->count(),
+            'data'   => $usuarios
+        ], 200);
     }
 
-    // 2. CREAR NUEVO
+    /**
+     * Registro con validación impecable.
+     */
     public function store(Request $request)
     {
-        $request->validate([
-            'nombre' => 'required|string',
-            'email' => 'required|email|unique:usuarios',
-            'puesto' => 'required|string'
+        $validator = Validator::make($request->all(), [
+            'nombre' => 'required|string|max:255',
+            'email'  => 'required|email|unique:usuarios,email',
+            'puesto' => 'required|string|max:100'
         ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'errors' => $validator->errors()
+            ], 422);
+        }
 
         $usuario = Usuario::create($request->all());
 
         return response()->json([
-            'mensaje' => 'Usuario creado con éxito',
-            'data' => $usuario
+            'status'  => 'success',
+            'message' => 'Un nuevo integrante ha llegado a Wonderland',
+            'data'    => $usuario->only(['id', 'nombre', 'puesto']) // Minimalismo
         ], 201);
     }
 
-    // 3. ACTUALIZAR (EDITAR)
-    public function update(Request $request, $id)
-    {
-        $usuario = Usuario::find($id);
-
-        if (!$usuario) {
-            return response()->json(['mensaje' => 'Usuario no encontrado'], 404);
-        }
-
-        $usuario->update($request->all());
-
-        return response()->json([
-            'mensaje' => 'Usuario actualizado con éxito',
-            'data' => $usuario
-        ], 200);
-    }
-
-    // 4. ELIMINAR (BORRAR)
+    /**
+     * Eliminar con respuesta profesional.
+     */
     public function destroy($id)
     {
         $usuario = Usuario::find($id);
 
         if (!$usuario) {
-            return response()->json(['mensaje' => 'Usuario no encontrado'], 404);
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'No pudimos encontrar el registro solicitado'
+            ], 404);
         }
 
         $usuario->delete();
 
         return response()->json([
-            'mensaje' => 'Usuario eliminado correctamente'
+            'status'  => 'success',
+            'message' => 'Registro removido con éxito'
         ], 200);
     }
 }
