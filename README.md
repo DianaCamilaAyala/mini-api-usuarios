@@ -1,43 +1,42 @@
 # Mini API de Usuarios | Digital Wonderland
 
-Este proyecto forma parte de mi ecosistema de desarrollo personal. Es una **API RESTful** construida con **Laravel 11**, diseñada para demostrar el manejo de operaciones CRUD, validación de datos y respuestas estandarizadas en formato JSON.
+> **Arquitectura minimalista. Respuestas consistentes. Diseño funcional.**
 
-> **Propósito:** Servir como un motor de datos (Backend) desacoplado, capaz de alimentar aplicaciones web o móviles.
+Esta es una API RESTful desarrollada con **Laravel 11** que gestiona el registro de integrantes en el ecosistema de *Digital Wonderland*. El proyecto prioriza la limpieza del código y la elegancia en la entrega de datos, eliminando el ruido técnico innecesario para el cliente final.
 
 ---
 
-## Tecnologías Utilizadas
+## Toque Minimalista
+A diferencia de una API convencional, este proyecto implementa:
+* **Encapsulamiento de Datos:** Solo se exponen los campos esenciales (`id`, `nombre`, `puesto`).
+* **Respuestas Estructuradas:** Cada respuesta sigue el mismo patrón de éxito o error para facilitar la integración.
+* **Filtros Discretos:** Capacidad de búsqueda por puesto mediante parámetros limpios en la URL.
 
-* **Framework:** Laravel 11
-* **Lenguaje:** PHP 8.x
+---
+
+## Especificaciones Técnicas
+
+* **Framework:** Laravel 11 (PHP 8.x)
 * **Base de Datos:** MySQL
-* **Herramienta de Pruebas:** Thunder Client / Postman
+* **Estandarización:** Respuestas en formato JSON nativo.
 
 ---
 
-## Funcionalidades Técnicas
+## Guía de Endpoints (Documentación)
 
-* **Arquitectura MVC:** Separación clara entre el modelo de datos y la lógica de control.
-* **Validación de Datos:** Reglas estrictas para asegurar que cada entrada sea válida y única (ej. email único).
-* **Manejo de Respuestas:** Códigos de estado HTTP precisos (201 para creación, 404 para no encontrado, 200 para éxito).
+La URL base para todas las peticiones es: `http://localhost:8000/api`
 
----
+| Método | Ruta | Acción | Parámetro (Opcional) |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/usuarios` | Listar todos los viajeros | `?puesto={cargo}` |
+| `POST` | `/usuarios` | Registrar nuevo integrante | *(Requiere Body)* |
+| `DELETE` | `/usuarios/{id}` | Remover del registro | |
 
-## Endpoints (Rutas de la API)
-
-La URL base es: `http://localhost:8000/api`
-
-| Método | Endpoint | Descripción |
-| :--- | :--- | :--- |
-| **GET** | `/usuarios` | Retorna una lista de todos los usuarios registrados. |
-| **POST** | `/usuarios` | Registra un nuevo usuario (requiere JSON en el body). |
-| **PUT** | `/usuarios/{id}` | Actualiza la información de un usuario existente. |
-| **DELETE** | `/usuarios/{id}` | Elimina permanentemente un usuario de la base de datos. |
-
-### Ejemplo de JSON para POST/PUT:
+### Ejemplo de Registro (POST)
+**Body (JSON):**
 ```json
 {
-    "nombre": "Dian Dev",
-    "email": "dian@wonderland.com",
-    "puesto": "Full Stack Developer"
+    "nombre": "Diana",
+    "email": "diana@wonderland.com",
+    "puesto": "Lead Developer"
 }
